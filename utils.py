@@ -18,7 +18,7 @@ def get_random_string(length):
 
 def get_captcha_url(html):
     soup = BeautifulSoup(html, "html.parser")
-    capcha_block = soup.find('div', {'class': 'b-captcha__info'})
+    capcha_block = soup.find('div', {'class': 'captcha__container'})
     images = capcha_block.find_all('img')
     for img in images:
         if img.has_attr('src'):
@@ -29,7 +29,6 @@ def get_captcha_url(html):
 
 
 def download_captcha(img_url):
-    print(img_url)
     #filename = img_url.split("/")[-1]
     filename = (get_random_string(5)+'.jpg')
     r = requests.get(img_url, timeout=0.5)
@@ -44,8 +43,10 @@ def captcha_response(img_name, captcha_api_key):
     solver = TwoCaptcha(api_key)
     try:
         result = solver.normal(f'{img_name}')
+        #os.remove(os.getcwd() + f'./{img_name}')
         return result['code']
     except:
+        #os.remove(os.getcwd() + f'./{img_name}')
         return False
 
 

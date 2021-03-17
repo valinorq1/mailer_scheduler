@@ -16,6 +16,9 @@ from selenium.webdriver.support.ui import Select
 
 from utils import captcha_three
 
+
+API = '85a9a133c454bea489b63692901579b6'
+
 class MailScheduler():
     def __init__(self):
         chrome_options = Options()
@@ -26,20 +29,42 @@ class MailScheduler():
 
     def register(self):
         url = "https://passport.yandex.ru/registration"
-        for i in range(1,3):
-            self.driver.get(url)
+        self.driver.get(url)
+        #for i in range(1,3):
+            #self.driver.get(url)
 
-        self.driver.find_elements_by_xpath("//input[contains(@id,'firstname')]")
-        self.driver.find_elements_by_xpath("//input[contains(@id,'lastname')]")
-        self.driver.find_elements_by_xpath("//input[contains(@id,'login')]")
-        self.driver.find_elements_by_xpath("//input[@id='password']")
-        self.driver.find_elements_by_xpath("//input[contains(@id,'password_confirm')]")
+        #  основные данные
+        self.driver.find_element_by_xpath("//input[contains(@id,'firstname')]").send_keys('Саша')
+        self.driver.find_element_by_xpath("//input[contains(@id,'lastname')]").send_keys('Макушкин')
+        self.driver.find_element_by_xpath("//input[contains(@id,'login')]").send_keys('Presley14687421')
+        self.driver.find_element_by_xpath("//input[@id='password']").send_keys('En1996ru')
+        self.driver.find_element_by_xpath("//input[contains(@id,'password_confirm')]").send_keys('En1996ru')
         
-        self.driver.find_elements_by_xpath("//span[contains(.,'У меня нет телефона')]").click()
-        #
-        select = Select(self.driver.find_elements_by_xpath("//select[contains(@class,'Select2-Control')]"))
+        self.driver.find_element_by_xpath("//span[contains(.,'У меня нет телефона')]").click()
+        time.sleep(1.5)
+        select = Select(self.driver.find_element_by_xpath("//select[contains(@class,'Select2-Control')]"))
         select.select_by_visible_text('Фамилия вашего любимого музыканта')
-        #
-        self.driver.find_elements_by_xpath("//input[contains(@id,'hint_answer')]").send_keys('Presley')
+        self.driver.find_element_by_xpath("//input[contains(@id,'hint_answer')]").send_keys('Presley')  #  секретный вопрос
 
-        
+        captcha_field = self.driver.find_element_by_xpath("//input[contains(@id,'captcha')]")
+
+        while True:
+            # на всякий чистим поле капчи
+            for k in range(1,15):
+                captcha_field.send_keys(Keys.BACK_SPACE)
+            #  посылаем на разгадку
+            captcha = captcha_three(self.driver.page_source, API)
+            if captcha:
+                captcha_field.send_keys(captcha)
+                self.driver.find_element_by_xpath("//button[@data-t='button:action'][contains(.,'Зарегистрироваться')]").click()
+                if 'Ваш аккаунт готов!' in self.driver.page_source:
+                    break
+                else:
+                    continue
+            else:
+                continue
+            
+
+
+st = MailScheduler()
+st.register()
