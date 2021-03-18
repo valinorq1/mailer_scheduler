@@ -17,7 +17,7 @@ from selenium.webdriver.support.ui import Select
 from utils import captcha_three
 
 
-API = '85a9a133c454bea489b63692901579b6'
+
 
 class MailScheduler():
     def __init__(self):
